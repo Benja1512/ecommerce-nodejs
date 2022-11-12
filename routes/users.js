@@ -4,6 +4,7 @@ const {Category} = require("../models/category");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 
+
 // LIST OF USER
 router.get(`/`, async (req, res) => {
     const userList = await User.find().select("-passwordHash");
@@ -25,6 +26,7 @@ router.get('/:id', async (req, res) => {
     res.status(200).send(users);
 
 })
+
 
 //post and register a new users
 router.post('/',
@@ -52,15 +54,25 @@ router.post('/',
         res.send(user);
     })
 
+
 //Update user data with / without password
 router.put('/:id',async (req, res) => {
+    
+    const userExist = await User.findById(req.params.id);
+        let newPassword
+        if(req.body.password){
+            newPassword = bcrypt.hashSync(req.body.password, 10)
+            } else {
+            newPassword = userExist.passwordHash;
+            }
+
     const user = await User.findByIdAndUpdate(
         req.params.id,
         {
             name: req.body.name,
             email: req.body.email,
             color: req.body.color,
-            passwordHash: bcrypt.hashSync(req.body.password, 10),
+            passwordHash: newPassword,
             phone: req.body.isAdmin,
             isAdmin: req.body.isAdmin,
             apartment: req.body.apartment,
@@ -75,6 +87,27 @@ router.put('/:id',async (req, res) => {
         return res.status(400).send('the user cannot be created!')
 
     res.send(user);
+})
+
+
+//Login a User REST API & creating a token
+router.post('/login', async (req,res) => {
+    const user = await User.findOne({email: req.body.email})
+
+    if(!user) {
+        return res.status(400).send('the user not found');
+    }
+
+    if(user && bcrypt.compareSync(req.body.password, user.passwordHash)) {
+        res.status(200).send('user Authenticated')
+    } else {
+        res.status(400).send('password is wrong!');
+    }
+
+    return res.status(200).send(user);
+
+
+
 })
 
 
