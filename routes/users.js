@@ -3,6 +3,7 @@ const {User} = require("../models/user");
 const {Category} = require("../models/category");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
+const jwt = require('jsonwebtoken')
 
 
 // LIST OF USER
@@ -93,18 +94,27 @@ router.put('/:id',async (req, res) => {
 //Login a User REST API & creating a token
 router.post('/login', async (req,res) => {
     const user = await User.findOne({email: req.body.email})
-
+    const secret = process.env.secret;
     if(!user) {
         return res.status(400).send('the user not found');
     }
 
     if(user && bcrypt.compareSync(req.body.password, user.passwordHash)) {
-        res.status(200).send('user Authenticated')
-    } else {
-        res.status(400).send('password is wrong!');
-    }
+        const token = jwt.sign(
+            {
+                userId: user.id
+             },
+            secret,
+            //{expireIn : '1d'}
+        )
 
-    return res.status(200).send(user);
+        res.status(200).send({user: user.email, token, token})
+
+        } else {
+            res.status(400).send('password is wrong!');
+        }
+
+        return res.status(200).send(user);
 
 
 

@@ -4,6 +4,7 @@ const {json} = require('express');
 const cors = require('cors');
 const app = express();
 const port = 4000
+//const authJwt = require('./helpers/jwt');
 
 const morgan = require('morgan');
 const mongoose = require('mongoose');
@@ -18,6 +19,7 @@ require('dotenv/config');
         //middleware
         app.use(bodyParser.json());
         app.use(morgan('tiny'))
+        //app.use(authJwt);
 
 
     //routes
