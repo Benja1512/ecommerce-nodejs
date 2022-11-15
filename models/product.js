@@ -33,7 +33,7 @@ const mongoose = require('mongoose');
             category: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'Category',
-                //required: true
+                required: true
             },
             countInStock: {
                 type: Number,
