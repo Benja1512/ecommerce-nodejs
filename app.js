@@ -20,6 +20,8 @@ require('dotenv/config');
         app.use(bodyParser.json());
         app.use(morgan('tiny'))
         //app.use(authJwt);
+        app.use('public/upload', express.static(__dirname + 'public/upload'))
+        //app.use(errorHanlder);
 
 
     //routes
